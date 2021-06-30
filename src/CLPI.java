@@ -17,6 +17,8 @@ public class CLPI {
     boolean read;
     GraphFrame graphFrame;
 
+    String script_path, exe_path;
+
     public void load() {
         String pathToOctaveCliExe = "/usr/bin/octave";
         String func = "function a = func(b)" + System.lineSeparator() + "a = b;" + System.lineSeparator()
@@ -57,14 +59,26 @@ public class CLPI {
     }
 
     public void init() {
-        String pathToOctaveCliExe = "/usr/bin/octave";
+        ProcessBuilder builder;
+        if (System.getProperty("os.name").contains("Windows"))
+        {
+            exe_path = "\\Program Files\\GNU Octave\\Octave-6.2.0\\mingw64\\bin\\octave-gui.exe";
+            script_path = "C:\\Users\\morit\\Downloads\\stinson.m";
+            builder = new ProcessBuilder('"' + exe_path + '"', "--silent");
+        }
+        else{
+            exe_path = "/usr/bin/octave";
+            builder = new ProcessBuilder(exe_path, "--silent");
+            script_path = "/home/moritz/Downloads/stinson.m";
+
+        }
+        
         String func = "function a = func(b)" + System.lineSeparator() + "a = b;" + System.lineSeparator()
                 + "endfunction" + System.lineSeparator();
 
         // ProcessBuilder builder = new
         // ProcessBuilder(pathToOctaveCliExe,"--silent","--no-window-system");
-        ProcessBuilder builder = new ProcessBuilder(pathToOctaveCliExe, "--silent");
-
+         
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         try {
@@ -75,7 +89,7 @@ public class CLPI {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
             this.frame.writer = writer;
 
-            BufferedReader file = new BufferedReader(new FileReader("/home/moritz/Downloads/stinson.m"));
+            BufferedReader file = new BufferedReader(new FileReader(script_path));
             StringBuffer inputBuffer = new StringBuffer();
             String line;
 
@@ -161,7 +175,7 @@ public class CLPI {
                         //alpha2.addAll(line_list);
                         line_list.remove("alpha2");
                         line_list.remove("alpha21");
-                        ops.println(alpha21.size());
+                        //ops.println(alpha21.size());
                         graphFrame.values = alpha21;
                         graphFrame.draw();
 

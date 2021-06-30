@@ -17,29 +17,38 @@ public class GraphFrame extends JFrame {
      }
 
      public void draw() {
-          getContentPane().repaint();
+          DrawPane d = ((DrawPane)getContentPane());
+          d.values = values;
+          d.repaint();
+          //getContentPane().repaint();
      }
 
      // Create a component that you can actually draw on.
      class DrawPane extends JPanel {
-          public void paintComponent(Graphics g) {
+          List<String> values;
+          @Override
+          public void paint(Graphics g) {
+               System.out.println(values.size());
                int height = 200;
                int x = 0;
-               for (String v : values) {
+               Iterator<String> iter = values.iterator();
+               for (String v : this.values) {
+               //     while(iter.hasNext()){
+               //          String v = iter.next();
                     try {
                          double value = Double.parseDouble(v);
 
                          // eg 0.1 => 10
                          value *= 100;
-                         System.out.print((int) value);
-                         g.drawLine(x, height, x, (int) (200.0 - value));
+                         //System.out.print((int) value);
+                         g.drawRect(x, (int) (200.0 - value), 1, 1);
                          x += 1;
                     } catch (NumberFormatException e) {
 
                     }
                }
 
-               System.out.println(x);
+               //System.out.println(x);
           }
      }
 

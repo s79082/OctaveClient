@@ -34,7 +34,7 @@ public class ViewFrame extends JFrame {
         submitButton.addActionListener((ActionEvent e) -> {
             try {
                 // input the file content to the StringBuffer "input"
-                BufferedReader file = new BufferedReader(new FileReader("/home/moritz/Downloads/stinson.m"));
+                BufferedReader file = new BufferedReader(new FileReader(clpi.script_path));
                 StringBuffer inputBuffer = new StringBuffer();
                 String line;
                 int line_nr = 0;
@@ -55,15 +55,17 @@ public class ViewFrame extends JFrame {
                     writer.write(line.replace(";", "") + System.lineSeparator());
                     inputBuffer.append('\n');
                     // writer.write(line);
-                    System.out.println(line);
+                    //System.out.println(line);
                 }
                 writer.flush();
                 file.close();
 
                 String inputStr = inputBuffer.toString();
-                FileOutputStream fileOut = new FileOutputStream("/home/moritz/Downloads/stinson.m");
+                FileOutputStream fileOut = new FileOutputStream(clpi.script_path);
                 fileOut.write(inputStr.getBytes());
                 fileOut.close();
+
+                
 
             } catch (Exception ex) {
                 System.out.println("Problem reading file.");
