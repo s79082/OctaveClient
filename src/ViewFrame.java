@@ -32,8 +32,14 @@ public class ViewFrame extends JFrame {
         setLocation(50, 50);
 
         submitButton.addActionListener((ActionEvent e) -> {
+
+            
             try {
+
+                writer.write("[a1,a2]=calc(15e-3, 15e-3, 0.75e-3, 0.1)"+ System.lineSeparator());
+                writer.flush();
                 // input the file content to the StringBuffer "input"
+                /*
                 BufferedReader file = new BufferedReader(new FileReader(clpi.script_path));
                 StringBuffer inputBuffer = new StringBuffer();
                 String line;
@@ -65,7 +71,7 @@ public class ViewFrame extends JFrame {
                 fileOut.write(inputStr.getBytes());
                 fileOut.close();
 
-                
+                */
 
             } catch (Exception ex) {
                 System.out.println("Problem reading file.");

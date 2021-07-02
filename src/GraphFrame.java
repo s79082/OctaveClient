@@ -9,6 +9,7 @@ public class GraphFrame extends JFrame {
      public GraphFrame() {
           super("My Frame");
 
+          values = new ArrayList<>();
           // You can set the content pane of the frame to your custom class.
           setContentPane(new DrawPane());
           setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -25,9 +26,10 @@ public class GraphFrame extends JFrame {
 
      // Create a component that you can actually draw on.
      class DrawPane extends JPanel {
-          List<String> values;
+          List<String> values = new ArrayList<>();
           @Override
           public void paint(Graphics g) {
+               super.paint(g);
                System.out.println(values.size());
                int height = 200;
                int x = 0;
@@ -35,6 +37,7 @@ public class GraphFrame extends JFrame {
                for (String v : this.values) {
                //     while(iter.hasNext()){
                //          String v = iter.next();
+               //System.out.println("value" + v);
                     try {
                          double value = Double.parseDouble(v);
 
