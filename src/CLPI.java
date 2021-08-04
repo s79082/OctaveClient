@@ -95,7 +95,7 @@ public class CLPI {
             }
             startValues = new String[] { "15e-3", "15e-3", "75e-4", "0.1" };
             r.close();
-            
+
         } catch (FileNotFoundException fex) {
             fex.printStackTrace();
         } catch (IOException ioex) {
@@ -246,6 +246,8 @@ public class CLPI {
                 Timer timer = new Timer();
                 List<String> result = new ArrayList<>();
                 List<LineParser> parsers = new LinkedList<>();
+                parsers.add(new LineParser("a1"));
+                parsers.add(new LineParser("a2"));
                 LineParser active = null;
 
                 // TODO implement working extraction of values
@@ -253,32 +255,43 @@ public class CLPI {
 
                     while ((line = br.readLine()) != null) {
 
+                        //ops.println(line);
+
                         for (LineParser lineParser : parsers) {
-                            if (line.contains(lineParser.id))
-                            {
+                            if (line.contains(lineParser.id)) {
                                 active = lineParser;
                                 break;
                             }
-
                         }
-                        if(active != null)
+
+                        //if (active.done)
+                          //  continue;
+
+                        if (active != null) {
                             active.parseLine(line);
-                        //ops.println(line);
 
-                        /*
-                         * for (OutputFormatElement element: matrices) { if
-                         * (line.contains(element.ident)) { element.reading = true; break; } }
-                         */
+                            if (active.done) {
+                                // read the last line
+                                active.parseLine(br.readLine());
+                                // get the parsed list
+                                //graphFrame.draw(new ArrayList<>(active.getValues()));
+                                graphFrame.addToGraph(active.getValues());
+                                // clear akku
+                                System.out.println(active.values);
+                                active.values.clear();
+                                active.done = false;
 
-                        // if(line.contains(result_matrices.peek().getKey()))
-
-                        // indicates that last line follows
+                            }
+                        }
+                        
+                        // ops.println(line);
+/*
                         if (line.contains("1241")) {
                             // add last line
                             result.addAll(extractNumbers(br.readLine()));
                             // copy the list
                             graphFrame.draw(new ArrayList<>(result));
-
+                            //ops.println(result);
                             result.clear();
                             read = false;
                             continue;
@@ -297,19 +310,37 @@ public class CLPI {
                         if (!read)
                             continue;
 
+                            List<String> line_list = extractNumbers(line);
+                            // ops.println(line_list);
+                            // ops.println(result.size());
+    
+                            result.addAll(line_list);
                         /*
-                         * if (line.contains("alpha21")) {
-                         * 
-                         * alpha21 = new ArrayList<>(); read_a21 = true; continue; } if
-                         * (line.contains("alpha2")) { alpha2 = new ArrayList<>(); read_a2 = true;
-                         * read_a21 = false; graphFrame.values = alpha21; graphFrame.draw(); continue; }
+                         * for (OutputFormatElement element: matrices) { if
+                         * (line.contains(element.ident)) { element.reading = true; break; } }
                          */
 
-                        List<String> line_list = extractNumbers(line);
-                        // ops.println(line_list);
-                        // ops.println(result.size());
+                        // if(line.contains(result_matrices.peek().getKey()))
 
-                        result.addAll(line_list);
+                        // indicates that last line follows
+                        /*
+                         * if (line.contains("1241")) { // add last line
+                         * result.addAll(extractNumbers(br.readLine())); // copy the list
+                         * graphFrame.draw(new ArrayList<>(result));
+                         * 
+                         * result.clear(); read = false; continue; // result = new ArrayList<>(); }
+                         * 
+                         * if (line.contains("Column")) continue; if (line.isBlank()) continue;
+                         * 
+                         * if (line.contains("a2")) { ops.println("now redin"); read = true; } if
+                         * (!read) continue;
+                         * 
+                         * 
+                         * List<String> line_list = extractNumbers(line); // ops.println(line_list); //
+                         * ops.println(result.size());
+                         * 
+                         * result.addAll(line_list);
+                         */
 
                         /*
                          * if (read_a21) alpha21.addAll(line_list);

@@ -14,15 +14,22 @@ public class GraphFrame extends JFrame {
 
      // List<String> values;
 
+     static final int N_GRAPHS = 2;
+
      DrawPane graph;
 
-     private static final int BORDER_GAP = 30;
-     private static final int GRAPH_POINT_WIDTH = 12;
-     private static final int Y_HATCH_CNT = 10;
-     private static final Stroke STROKE = new BasicStroke(2f);
+     public List<Graph> graphs;
+
+     static Random ran = new Random();
+
+     public static final int BORDER_GAP = 30;
+     public static final int GRAPH_POINT_WIDTH = 12;
+     public static final int Y_HATCH_CNT = 10;
+     public static final Stroke STROKE = new BasicStroke(2f);
 
      public GraphFrame() {
           super("My Frame");
+          graphs = new ArrayList<>();
           // You can set the content pane of the frame to your custom class.
           graph = new DrawPane();
           setContentPane(graph);
@@ -40,6 +47,29 @@ public class GraphFrame extends JFrame {
           this.graph.repaint();
           System.out.println(vs.size());
           // getContentPane().repaint();
+     }
+
+     public void addToGraph(List<String> vals)
+     {
+          // all graphs have already been drawn, delete them
+          if (graphs.size() % N_GRAPHS == 0)
+               graphs.clear();
+          List<Double> double_list = new ArrayList<>();
+          for (String s : vals) {
+               try {
+                    double_list.add(Double.parseDouble(s));
+               } catch (NumberFormatException e) {
+                    continue;
+               }
+          }
+
+          // generate random color
+          Color color = new Color(ran.nextInt(255), ran.nextInt(255), ran.nextInt(255), 255);
+
+          this.graphs.add(new Graph(double_list, color));
+          this.graph.repaint();
+          System.out.println(graphs.size());
+          
      }
 
      public void drawValues(List<String> values) {
@@ -60,10 +90,11 @@ public class GraphFrame extends JFrame {
           public void paint(Graphics g) {
                super.paint(g);
                Graphics2D g2 = (Graphics2D) g;
+               /*
                if (this.values == null || this.values.size() == 0)
                     return;
 
-               drawAxis(g2);
+               
 
                // convert to double
                List<Double> double_list = new ArrayList<>();
@@ -74,7 +105,28 @@ public class GraphFrame extends JFrame {
                          continue;
                     }
                }
+*/
+               //Graph graph = new Graph(double_list, Color.GREEN);
+               //graph.draw(g2, getWidth(), getHeight(), Collections.max(double_list));
 
+               drawAxis(g2);
+
+               // find the max value of values of all graphs
+               List<Double> maximas = new ArrayList<>();
+               for (Graph graph : graphs) {
+                    maximas.add(Collections.max(graph.values));
+               }
+               
+               Double max = Double.MIN_VALUE;
+               if (maximas.size() > 0)
+                    max = Collections.max(maximas);
+
+               for (Graph graph: graphs)
+               {
+                    graph.draw(g2, getWidth(), getHeight(), max);
+               }
+
+/*
                Double max = Collections.max(double_list);
 
                // calc drawing points
@@ -101,6 +153,7 @@ public class GraphFrame extends JFrame {
                     g2.drawLine(x1, y1, x2, y2);
 
                }
+               */
 
           }
 
