@@ -11,16 +11,28 @@ public class ValueInputGroup{
     JTextField valueField;
     JButton incr, decr;
     JLabel label;
+    List<Action> actions;
 
-    public ValueInputGroup(String name) {
+    public ValueInputGroup(String name, List<Action> as) {
         valueField = new JTextField();
         label = new JLabel(name);
         incr = new JButton("+");
-        incr.addActionListener(new TextFieldValueChanger(valueField, TextFieldValueChanger.ChangeAction.INCREMENT));
+        TextFieldValueChanger incrementer = new TextFieldValueChanger(valueField, TextFieldValueChanger.ChangeOperation.INCREMENT, as);
+        incr.addActionListener(incrementer);
         decr = new JButton("-");
-        decr.addActionListener(new TextFieldValueChanger(valueField, TextFieldValueChanger.ChangeAction.DECREMENT));
+        TextFieldValueChanger decrementer = new TextFieldValueChanger(valueField, TextFieldValueChanger.ChangeOperation.DECREMENT, as);
+        decr.addActionListener(decrementer);
 
-        
+    }
+
+    public String getValue()
+    {
+        return this.valueField.getText();
+    }
+
+    public void setValue(String v)
+    {
+        this.valueField.setText(v);
     }
 
     public List<Component> getComponents()

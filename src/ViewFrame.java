@@ -51,10 +51,13 @@ public class ViewFrame extends JFrame {
         setLayout(layout);
         // setLayout(null);
         submitButton.setLocation(50, 50);
-        ValueInputGroup d2 = new ValueInputGroup("d2");
-        ValueInputGroup d1 = new ValueInputGroup("d1");
-        ValueInputGroup rpore = new ValueInputGroup("rpore");
-        ValueInputGroup phi = new ValueInputGroup("phi");
+
+        List<Action> after_actions = new LinkedList<>();
+        after_actions.add(this::sendCommand);
+        ValueInputGroup d2 = new ValueInputGroup("d2", after_actions);
+        ValueInputGroup d1 = new ValueInputGroup("d1", after_actions);
+        ValueInputGroup rpore = new ValueInputGroup("rpore", after_actions);
+        ValueInputGroup phi = new ValueInputGroup("phi", after_actions);
 
         this.valueInputGroups = new LinkedList<>();
         valueInputGroups.add(d2);
@@ -134,15 +137,30 @@ public class ViewFrame extends JFrame {
     public void sendCommand()
     {
         try {
+            String d1, d2, rpore, phi;
+            d2 = valueInputGroups.get(0).getValue();
+            d1 = valueInputGroups.get(1).getValue();
+            rpore = valueInputGroups.get(2).getValue();
+            phi = valueInputGroups.get(3).getValue();
 
-            String cmd = "[a1,a2]=calc(" + tf_d2.getText() + ", " + tf_d1.getText() + ", " + tf_rpore.getText()
-                    + ", " + tf_phi.getText() + ")";
+            String cmd = "[a1,a2]=calc(" + d2+ ", " + d1 + ", " + rpore
+                    + ", " + phi + ")";
             writer.write(cmd + System.lineSeparator());
             writer.flush();
         }
         catch(IOException e)
         {
             e.printStackTrace();
+        }
+    }
+
+    public void setValues(String[] vals)
+    {
+        int idx = 0;
+        for(ValueInputGroup g: this.valueInputGroups)
+        {
+            g.setValue(vals[idx]);
+            idx++;
         }
     }
 

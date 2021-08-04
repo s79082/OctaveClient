@@ -10,6 +10,7 @@ import java.io.StreamCorruptedException;
 import java.nio.Buffer;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import java.util.Timer;
@@ -71,33 +72,36 @@ public class CLPI {
          * 
          * } }
          */
-    
+
         try {
-            if(config_file.createNewFile())
-                saveStartValues(new String[]{"15e-3", "15e-3", "0.75e-3", "0.1"});
+            if (config_file.createNewFile())
+                saveStartValues(new String[] { "15e-3", "15e-3", "75e-4", "0.1" });
         } catch (IOException e) {
             e.printStackTrace();
         }
         // if (config_file.exists() && !config_file.isDirectory())
-        
-            try {
-                BufferedReader r = new BufferedReader(new FileReader(config_file));
-                String ln;
-                int i = 0;
-                while ((ln = r.readLine()) != null) {
 
-                    if(i >= 4)
-                        break;
-                    this.startValues[i] = ln;
-                    System.out.println(startValues[i]);
-                    i++;
-                }
-            } catch (FileNotFoundException fex) {
-                fex.printStackTrace();
-            } catch (IOException ioex) {
-                ioex.printStackTrace();
+        try {
+            BufferedReader r = new BufferedReader(new FileReader(config_file));
+            String ln;
+            int i = 0;
+            while ((ln = r.readLine()) != null) {
+
+                if (i >= 4)
+                    break;
+                this.startValues[i] = ln;
+                System.out.println(startValues[i]);
+                i++;
             }
-        
+            startValues = new String[] { "15e-3", "15e-3", "75e-4", "0.1" };
+            r.close();
+            
+        } catch (FileNotFoundException fex) {
+            fex.printStackTrace();
+        } catch (IOException ioex) {
+            ioex.printStackTrace();
+        }
+
     }
 
     public void saveStartValues(String[] vs) {
@@ -112,12 +116,14 @@ public class CLPI {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
     }
 
     public void init() {
 
         loadStartValues();
+
+        this.frame.setValues(this.startValues);
         /*
          * else { config_file.createNewFile(); }
          */
@@ -156,11 +162,11 @@ public class CLPI {
             // testcall function
             // writer.write("[a1,a2]=calc(15e-3, 15e-3, 0.75e-3, 0.1)"+
             // System.lineSeparator());
-            startValues = new String[]{"15e-3", "15e-3", "0.75e-3", "0.1"};
+            startValues = new String[] { "15e-3", "15e-3", "0.75e-3", "0.1" };
             writer.flush();
             String cmd = "[a1,a2]=calc(" + startValues[0] + ", " + startValues[1] + ", " + startValues[2] + ", "
                     + startValues[3] + ")";
-            writer.write(cmd);
+            // writer.write(cmd);
             // read the file for each line
 
             /*
@@ -224,29 +230,40 @@ public class CLPI {
                 boolean read_a2, read_a21;
                 read_a2 = read_a21 = false;
                 read = false;
-/*
-                // top is reading
-                Stack<AbstractMap.SimpleEntry<String, List<String>>> result_matrices = new Stack<>();
-                result_matrices.push(new AbstractMap.SimpleEntry<>("alpha21", new ArrayList<>()));
-                result_matrices.push(new AbstractMap.SimpleEntry<>("alpha2", new ArrayList<>()));
-                System.out.println(result_matrices);
-
-                List<OutputFormatElement> matrices = new ArrayList<>();
-                matrices.add(new OutputFormatElement("a1"));
-                matrices.add(new OutputFormatElement("a2"));
-
-                
-*/
+                /*
+                 * // top is reading Stack<AbstractMap.SimpleEntry<String, List<String>>>
+                 * result_matrices = new Stack<>(); result_matrices.push(new
+                 * AbstractMap.SimpleEntry<>("alpha21", new ArrayList<>()));
+                 * result_matrices.push(new AbstractMap.SimpleEntry<>("alpha2", new
+                 * ArrayList<>())); System.out.println(result_matrices);
+                 * 
+                 * List<OutputFormatElement> matrices = new ArrayList<>(); matrices.add(new
+                 * OutputFormatElement("a1")); matrices.add(new OutputFormatElement("a2"));
+                 * 
+                 * 
+                 */
 
                 Timer timer = new Timer();
                 List<String> result = new ArrayList<>();
+                List<LineParser> parsers = new LinkedList<>();
+                LineParser active = null;
 
                 // TODO implement working extraction of values
                 try {
 
                     while ((line = br.readLine()) != null) {
 
-                        // ops.println(line);
+                        for (LineParser lineParser : parsers) {
+                            if (line.contains(lineParser.id))
+                            {
+                                active = lineParser;
+                                break;
+                            }
+
+                        }
+                        if(active != null)
+                            active.parseLine(line);
+                        //ops.println(line);
 
                         /*
                          * for (OutputFormatElement element: matrices) { if
@@ -254,12 +271,17 @@ public class CLPI {
                          */
 
                         // if(line.contains(result_matrices.peek().getKey()))
+
+                        // indicates that last line follows
                         if (line.contains("1241")) {
-                            // copy the list 
+                            // add last line
+                            result.addAll(extractNumbers(br.readLine()));
+                            // copy the list
                             graphFrame.draw(new ArrayList<>(result));
-                            
+
                             result.clear();
                             read = false;
+                            continue;
                             // result = new ArrayList<>();
                         }
 
@@ -284,8 +306,8 @@ public class CLPI {
                          */
 
                         List<String> line_list = extractNumbers(line);
-                        //ops.println(line_list);
-                        //ops.println(result.size());
+                        // ops.println(line_list);
+                        // ops.println(result.size());
 
                         result.addAll(line_list);
 
